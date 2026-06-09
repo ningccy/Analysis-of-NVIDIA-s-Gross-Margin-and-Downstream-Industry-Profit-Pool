@@ -1,4 +1,7 @@
-yfinance 
-pandas 
-sqlalchemy 
-pymysql
+yfinance>=0.2.38
+pandas>=2.2.0
+sqlalchemy>=2.0.0
+pymysql>=1.1.0
+FinMind>=1.6.4
+requests>=2.31.0
+cryptography>=42.0.0
