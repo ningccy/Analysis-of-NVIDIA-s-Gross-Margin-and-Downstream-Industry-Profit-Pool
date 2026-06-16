@@ -70,13 +70,12 @@ try:
     )
 
   fig.update_layout(
-      xaxis_title = "時間軸",
-      yaxis_title = "利潤規模 (Operating Income)",
-      hovermode = "x unified",
-      height = 550,
-      )
+    xaxis_title = "時間軸",
+    yaxis_title = "利潤規模 (Operating Income)",
+    hovermode = "x unified",
+    height = 550)
   
-      st.plotly_chart(fig, use_container_width = True)
+  st.plotly_chart(fig, use_container_width = True)
   else:
       st.warning("請在左側控制面板至少勾選一家公司。")
 
