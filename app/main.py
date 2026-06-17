@@ -96,3 +96,5 @@ try:
     )
 
     st.divider()
+except Exception as e:
+    st.error(f"啟動失敗，請檢查資料庫連線或資料表名稱。錯誤訊息: {e}")
