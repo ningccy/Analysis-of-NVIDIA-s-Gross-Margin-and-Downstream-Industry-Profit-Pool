@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
 import os 
+import plotly.express as px
 from dotenv import load_dotenv
 
 st.set_page_config(page_title = "AI 供應鏈利潤池看板", layout = "wide")
@@ -25,7 +26,7 @@ st.title("📊 半導體與 AI 伺服器產業利潤池分析")
 st.markdown("本看板追蹤從上游晶片（NVIDIA）到下游組裝與品牌廠的利潤分配與定價權轉嫁。")
 st.divider()
 
-st.sider.header("💠 控制面板")
+st.sidebar.header("💠 控制面板")
 
 @st.cache_data
 def load_and_clean_data():
@@ -54,40 +55,42 @@ try:
   st.subheader("📈 產業利潤池結構變化")
 
   if not df_filtered.empty:
-    fig = px.bar(
-      df_filtered,
-      x = "display_quarter",
-      y = "operating_income", 
-      color = "ticker",
-      title = "各季度供應鏈總利潤分配份額",
-      labels = {
-        "display_quarter": "對齊後季度",
-        "operating_income": "營業利益 (USD)",
-        "ticker": "公司代碼",
-      },
-      barmode = "stack",
-      text = "ticker",
+        fig = px.bar(
+            df_filtered,
+            x = "display_quarter",
+            y = "operating_income",
+            color = "ticker",
+            title = "各季度供應鏈總利潤分配份額",
+            labels = {
+                "display_quarter": "對齊後季度",
+                "operating_income": "營業利益 (USD)",
+                "ticker": "公司代碼",
+            },
+            barmode = "stack",
+            text = "ticker",
+        )
+
+        fig.update_layout(
+            xaxis_title = "時間軸 (已對齊 NVDA 財政年度)",
+            yaxis_title = "利潤規模 (Operating Income)",
+            hovermode = "x unified",
+            height = 550,
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("請在左側控制面板至少勾選一家公司。")
+
+    st.divider()
+
+    # 數據明細表格
+    st.subheader("🧾 核心財務數據明細")
+    st.dataframe(
+        df_filtered[
+            ["ticker", "display_quarter", "revenue", "operating_income"]
+        ].sort_values(by="display_quarter", ascending=False),
+        hide_index = True,
+        use_container_width = True,
     )
 
-  fig.update_layout(
-    xaxis_title = "時間軸",
-    yaxis_title = "利潤規模 (Operating Income)",
-    hovermode = "x unified",
-    height = 550)
-  
-  st.plotly_chart(fig, use_container_width=True)
-  else:
-      st.warning("請在左側控制面板至少勾選一家公司。")
-
-  st.divider()
-
-  st.subheader("🧾 核心財務數據明細")
-  st.dataframe(
-    df_filtered[
-      ["ticker", "display_quarter", "revenue", "operating_income"]
-    ].sort_values(by = "display_quarter", ascending = False),
-    hide_index = True,
-    use_container_width = True,
-  )
-
-  st.divider()
+    st.divider()
