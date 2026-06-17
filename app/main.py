@@ -75,7 +75,7 @@ try:
     hovermode = "x unified",
     height = 550)
   
-  st.plotly_chart(fig, use_container_width = True)
+  st.plotly_chart(fig, use_container_width=True)
   else:
       st.warning("請在左側控制面板至少勾選一家公司。")
 
