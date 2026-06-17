@@ -15,11 +15,13 @@ def get_db_engine():
   USER = "5KntqF8ZunMNnjz.root"
   PASSWORD = "tYXheZ6gJz1HnhV9"
   DB_NAME = "industry_analysis"
-  connect_arge = {"ssl":{"ssl_verify_cert": False}}
+  
+  local_connect_args = {"ssl": {"ssl_verify_cert": False}}
+  
   return create_engine(
-    f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
-    connect_args = connect_args
-  )
+        f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
+        connect_args=local_connect_args
+    )
 engine = get_db_engine()
 
 st.title("📊 半導體與 AI 伺服器產業利潤池分析")
