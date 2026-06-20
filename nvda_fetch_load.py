@@ -16,8 +16,8 @@ nvda = yf.Ticker("NVDA")
 df_raw = nvda.quarterly_finanials
 
 if df_raw.empty:
-    print("can't found the data please check the connection and the Ticker is correct or not... ")
-    exit()
+        print("can't found the data please check the connection and the Ticker is correct or not... ")
+        exit()
 print("loading success start data cleaning...")
 ##-------------------------------------------
 df = df_raw.T
