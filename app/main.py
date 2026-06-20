@@ -118,7 +118,11 @@ st.divider()
 
 @st.cache_data
 def load_and_clean_data():
-    query = "SELECT ticker, fiscal_quarter, revenue, cogs, operating_income FROM financial_reports"
+    query = """
+    SELECT ticker, fiscal_quarter, revenue, cogs, operating_income 
+    FROM financial_reports
+    WHERE ticker IN ('NVDA', '3017.TW', '2382.TW', '2357.TW')
+    """
     df_raw = pd.read_sql(query, engine)
     if df_raw.empty:
         return pd.DataFrame()
