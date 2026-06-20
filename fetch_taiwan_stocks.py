@@ -31,48 +31,48 @@ all_cleaned_records = []
 start_date = "2023-01-01"
 
 for stock_id, info in target_companies.items():
-    print(f"\n 正在擷取 {info['name']} ({stock_id}) 的綜合損益表...")
+        print(f"\n 正在擷取 {info['name']} ({stock_id}) 的綜合損益表...")
     
-    df_raw = api.taiwan_stock_financial_statements(
-        stock_id=stock_id,
-        start_date=start_date
-    )
+        df_raw = api.taiwan_stock_financial_statements(
+            stock_id=stock_id,
+            start_date=start_date
+        )
     
-  if df_raw.empty:
-        print(f"無法取得 {stock_id} 的資料")
-        continue
-
-  mops_mapping = {
-          'Revenue': 'revenue',      
-          'CostOfGoodsSold': 'cogs',
-          'GrossProfitFromOperations': 'gross_profit',
-          'OperatingIncome': 'operating_income'
-      }
-      
-  df_filtered = df_raw[df_raw['type'].isin(mops_mapping.keys())].copy()
-  df_pivot = df_filtered.pivot(index='date', columns='type', values='value')
-
-  for col in mops_mapping.keys():
-        if col not in df_pivot.columns:
-            df_pivot[col] = pd.NA
+      if df_raw.empty:
+                print(f"無法取得 {stock_id} 的資料")
+                continue
+    
+      mops_mapping = {
+              'Revenue': 'revenue',      
+              'CostOfGoodsSold': 'cogs',
+              'GrossProfitFromOperations': 'gross_profit',
+              'OperatingIncome': 'operating_income'
+          }
           
-  df_standard = df_pivot.rename(columns=mops_mapping)
-  df_standard.index = pd.to_datetime(df_standard.index)
-  df_standard['fiscal_quarter'] = df_standard.index.to_period('Q').astype(str)
-  df_standard['ticker'] = f"{stock_id}.TW"
-  df_standard['company_name'] = info['name']
-  df_standard['tier'] = info['tier']
-
-  amount_cols = ['revenue', 'cogs', 'gross_profit', 'operating_income']
-  for col in amount_cols:
-      df_standard[col] = pd.to_numeric(df_standard[col], errors='coerce')
-      df_standard[col] = ((df_standard[col] * twd_to_usd_rate) / 1_000_000).round(2)
-        
-  final_cols = ['ticker', 'company_name', 'tier', 'fiscal_quarter', 'revenue', 'cogs', 'gross_profit', 'operating_income']
-  df_final = df_standard[final_cols].dropna(subset=['revenue'])
+      df_filtered = df_raw[df_raw['type'].isin(mops_mapping.keys())].copy()
+      df_pivot = df_filtered.pivot(index='date', columns='type', values='value')
     
-  all_cleaned_records.append(df_final)
-  print(f" {info['name']} 清洗完成，以百萬美元為單位。")
+      for col in mops_mapping.keys():
+            if col not in df_pivot.columns:
+                df_pivot[col] = pd.NA
+              
+      df_standard = df_pivot.rename(columns=mops_mapping)
+      df_standard.index = pd.to_datetime(df_standard.index)
+      df_standard['fiscal_quarter'] = df_standard.index.to_period('Q').astype(str)
+      df_standard['ticker'] = f"{stock_id}.TW"
+      df_standard['company_name'] = info['name']
+      df_standard['tier'] = info['tier']
+    
+      amount_cols = ['revenue', 'cogs', 'gross_profit', 'operating_income']
+      for col in amount_cols:
+          df_standard[col] = pd.to_numeric(df_standard[col], errors='coerce')
+          df_standard[col] = ((df_standard[col] * twd_to_usd_rate) / 1_000_000).round(2)
+            
+      final_cols = ['ticker', 'company_name', 'tier', 'fiscal_quarter', 'revenue', 'cogs', 'gross_profit', 'operating_income']
+      df_final = df_standard[final_cols].dropna(subset=['revenue'])
+        
+      all_cleaned_records.append(df_final)
+      print(f" {info['name']} 清洗完成，以百萬美元為單位。")
 
 if all_cleaned_records:
     df_all_tw = pd.concat(all_cleaned_records)
