@@ -24,6 +24,13 @@ def get_db_engine():
 engine = get_db_engine()
 
 try:
+    db_config = st.secrets["tidb"]
+except Exception:
+    raise FileNotFoundError(
+        "無法讀取 Streamlit Secrets，請確認專案根目錄下存在 .streamlit/secrets.toml"
+    )
+##--------
+try:
     response = requests.get("https://open.er-api.com/v6/latest/USD").json()
     twd_to_usd_rate = 1 / response['rates']['TWD']
 except Exception:
