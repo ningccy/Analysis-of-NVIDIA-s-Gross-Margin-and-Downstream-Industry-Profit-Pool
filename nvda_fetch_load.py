@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 from sqlalchemy import create_engine, text
 import numpy as np
+import streamlit as st
 
 def get_db_engine():
     db_config = st.secrets["tidb"]
