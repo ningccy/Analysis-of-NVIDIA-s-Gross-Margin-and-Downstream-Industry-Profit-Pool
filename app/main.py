@@ -10,19 +10,23 @@ load_dotenv()
 
 @st.cache_resource
 def get_db_engine():
-  HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
-  PORT = "4000"
-  USER = "5KntqF8ZunMNnjz.root"
-  PASSWORD = "tYXheZ6gJz1HnhV9"
-  DB_NAME = "test"
-  
-  local_connect_args = {"ssl": {"ssl_verify_cert": False}}
-  
-  return create_engine(
-        f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
-        connect_args=local_connect_args
-    )
+    db_config = st.secrets["tidb"]
+    
+    HOST = db_config["HOST"]
+    PORT = db_config["PORT"]
+    USER = db_config["USER"]
+    PASSWORD = db_config["PASSWORD"]
+    DB_NAME = db_config["DB_NAME"]
+
+    local_connect_args = {"ssl": {"ssl_verify_cert": False}}
+
+    return create_engine(
+            f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
+            connect_args=local_connect_args,
+        )
+
 engine = get_db_engine()
+
 
 st.title("📊 半導體與 AI 伺服器產業利潤池分析")
 st.markdown("本看板追蹤從上游晶片（NVIDIA）到下游組裝與品牌廠的利潤分配與定價權轉嫁。")
