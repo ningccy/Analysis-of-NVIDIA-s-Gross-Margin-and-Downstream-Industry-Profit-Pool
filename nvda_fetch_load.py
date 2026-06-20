@@ -12,11 +12,11 @@ def get_db_engine():
             " 無法讀取 Streamlit Secrets！請確認存在 .streamlit/secrets.toml"
         )
     
-    HOST = db_config["host"]
-    PORT = db_config["port"]
-    USER = db_config["user"]
-    PASSWORD = db_config["password"]
-    DB_NAME = db_config["database"] 
+    HOST = db_config["HOST"]
+    PORT = db_config["PORT"]
+    USER = db_config["USER"]
+    PASSWORD = db_config["PASSWORD"]
+    DB_NAME = db_config["DB_NAME"] 
 
     local_connect_args = {"ssl": {"ssl_verify_cert": False}}
 
