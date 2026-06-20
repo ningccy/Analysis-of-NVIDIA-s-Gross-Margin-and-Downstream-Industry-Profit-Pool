@@ -50,7 +50,7 @@ print(df_to_load)
 print(f"\n start write into TiDB database [{DB_NAME}]...")
 ##--------------------------------------
 upsert_sql = """
-INSERT INTO supply_chain_financials 
+INSERT INTO financial_reports 
 (ticker, company_name, tier, fiscal_quarter, revenue, cogs, gross_profit, operating_income)
 VALUES (:ticker, :company_name, :tier, :fiscal_quarter, :revenue, :cogs, :gross_profit, :operating_income)
 ON DUPLICATE KEY UPDATE
