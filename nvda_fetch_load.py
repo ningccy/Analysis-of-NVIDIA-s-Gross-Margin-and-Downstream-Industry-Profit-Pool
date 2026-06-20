@@ -3,13 +3,23 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 import numpy as np
 
-HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
-PORT = "4000"
-USER = "5KntqF8ZunMNnjz.root"
-PASSWORD = "tYXheZ6gJz1HnhV9"
-DB_NAME = "test" 
+def get_db_engine():
+    db_config = st.secrets["tidb"]
+    
+    HOST = db_config["HOST"]
+    PORT = db_config["PORT"]
+    USER = db_config["USER"]
+    PASSWORD = db_config["PASSWORD"]
+    DB_NAME = db_config["DB_NAME"]
 
-engine = create_engine(f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}")
+    local_connect_args = {"ssl": {"ssl_verify_cert": False}}
+
+    return create_engine(
+            f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
+            connect_args=local_connect_args,
+        )
+
+engine = get_db_engine()
 
 print("fetching nvidia's financial report...")
 nvda = yf.Ticker("NVDA")
