@@ -14,7 +14,7 @@ def get_db_engine():
   PORT = "4000"
   USER = "5KntqF8ZunMNnjz.root"
   PASSWORD = "tYXheZ6gJz1HnhV9"
-  DB_NAME = "industry_analysis"
+  DB_NAME = "test"
   
   local_connect_args = {"ssl": {"ssl_verify_cert": False}}
   
