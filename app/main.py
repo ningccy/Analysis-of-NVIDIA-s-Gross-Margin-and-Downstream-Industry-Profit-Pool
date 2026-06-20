@@ -86,7 +86,7 @@ try:
             height=550,
         )
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
     else:
         st.warning("請在左側控制面板至少勾選一家公司。")
@@ -99,7 +99,7 @@ try:
             ["ticker", "display_quarter", "revenue", "operating_income"]
         ].sort_values(by="display_quarter", ascending=False),
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
 
     st.divider()
