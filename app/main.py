@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 from sqlalchemy import create_engine, text
+import requests
 import os 
 import plotly.express as px
 from dotenv import load_dotenv
@@ -135,7 +136,6 @@ def load_and_clean_data():
         df.loc[nvda_mask, "display_quarter"] = (
             pd.to_datetime(df.loc[nvda_mask, "fiscal_quarter"]).dt.to_period("Q") - 1
         ).astype(str)
-
     df["operating_income"] = df["operating_income"].fillna(df["revenue"] - df["cogs"])
     return df
 
