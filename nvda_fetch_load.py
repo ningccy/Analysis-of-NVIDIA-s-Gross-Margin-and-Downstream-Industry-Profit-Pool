@@ -7,7 +7,7 @@ HOST = "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
 PORT = "4000"
 USER = "5KntqF8ZunMNnjz.root"
 PASSWORD = "tYXheZ6gJz1HnhV9"
-DB_NAME = "industry_analysis" 
+DB_NAME = "test" 
 
 engine = create_engine(f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}")
 
