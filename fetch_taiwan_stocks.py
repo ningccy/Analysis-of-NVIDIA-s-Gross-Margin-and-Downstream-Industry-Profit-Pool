@@ -24,6 +24,7 @@ target_companies = {
     '3017': {'name': 'AVC (奇鋐科技)', 'tier': 'Component'},
     '2382': {'name': 'Quanta (廣達電腦)', 'tier': 'ODM'},
     '2357': {'name': 'ASUS (華碩電腦)', 'tier': 'Brand'}
+}
 
 all_cleaned_records = []
 
