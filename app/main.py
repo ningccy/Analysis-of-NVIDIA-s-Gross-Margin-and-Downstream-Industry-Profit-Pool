@@ -40,7 +40,8 @@ def load_and_clean_data():
     nvda_mask = df["ticker"] == "NVDA"
 
     df.loc[nvda_mask, "display_quarter"] = (
-        pd.to_period(df.loc[nvda_mask, "fiscal_quarter"], freq="Q") - 1
+        pd.to_datetime(df.loc[nvda_mask, "fiscal_quarter"]).dt.to_period("Q")
+        - 1
     ).astype(str)
 
     df["operating_income"] = df["operating_income"].fillna(
