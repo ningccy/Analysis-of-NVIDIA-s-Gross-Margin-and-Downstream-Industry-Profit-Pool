@@ -21,14 +21,13 @@ def get_db_engine():
             connect_args=local_connect_args,
         )
 
-engine = get_db_engine()
-
 try:
     db_config = st.secrets["tidb"]
 except Exception:
     raise FileNotFoundError(
         "無法讀取 Streamlit Secrets，請確認專案根目錄下存在 .streamlit/secrets.toml"
     )
+engine = get_db_engine()
 ##--------
 try:
     response = requests.get("https://open.er-api.com/v6/latest/USD").json()
@@ -105,7 +104,6 @@ else:
     print("\n 錯誤: 沒有任何台股資料被成功清洗，停止執行寫入。")
     exit()
 
-print(f"開始將台股供應鏈數據寫入 TiDB [{DB_NAME}]...")
 
 upsert_sql = """
 INSERT INTO financial_reports 
