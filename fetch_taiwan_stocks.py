@@ -9,7 +9,7 @@ try:
     db_config = st.secrets["tidb"]
 except Exception:
     raise FileNotFoundError(
-        "無法讀取 Streamlit Secrets"
+        "無法讀取 Streamlit Secrets，請確認專案根目錄下存在 .streamlit/secrets.toml"
     )
 
 HOST = db_config["HOST"]
@@ -18,14 +18,12 @@ USER = db_config["USER"]
 PASSWORD = db_config["PASSWORD"]
 DB_NAME = db_config["DB_NAME"]
 
-
 def get_db_engine():
     local_connect_args = {"ssl": {"ssl_verify_cert": False}}
     return create_engine(
         f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
         connect_args=local_connect_args,
     )
-
 
 engine = get_db_engine()
 
@@ -51,16 +49,16 @@ start_date = "2023-01-01"
 for stock_id, info in target_companies.items():
     print(f"\n 正在擷取 {info['name']} ({stock_id}) 的綜合損益表...")
 
-    df_raw = api.taiwan_stock_financial_statements(
+    df_raw = api.taiwan_stock_financial_statement(
         stock_id=stock_id,
         start_date=start_date
     )
 
     if df_raw.empty:
-        print(f" 警告: 無法取得 {stock_id} 的資料 (FinMind 回傳空表，可能被擋或超過限額)！")
+        print(f" 警告:無法取得 {stock_id} 的資料 (FinMind 回傳空表，可能被擋或超過限額)！")
         continue
 
-    print(f"   成功取得 {stock_id} 原始資料共 {len(df_raw)} 筆，開始進行清洗...")
+    print(f" 成功取得 {stock_id} 原始資料共 {len(df_raw)} 筆，開始進行清洗...")
 
     mops_mapping = {
         'Revenue': 'revenue',
@@ -71,7 +69,7 @@ for stock_id, info in target_companies.items():
 
     df_filtered = df_raw[df_raw['type'].isin(mops_mapping.keys())].copy()
     if df_filtered.empty:
-        print(f" 警告: 篩選損益表科目後沒有符合的資料。")
+        print(f" 警告:篩選損益表科目後沒有符合的資料。")
         continue
 
     df_pivot = df_filtered.pivot(index='date', columns='type', values='value')
@@ -102,7 +100,7 @@ if all_cleaned_records:
     df_all_tw = pd.concat(all_cleaned_records)
     print(f"\n準備寫入資料庫，總計待寫入行數: {len(df_all_tw)}")
 else:
-    print("\n 錯誤: 沒有任何台股資料被成功清洗，停止執行寫入。")
+    print("\n 錯誤:沒有任何台股資料被成功清洗，停止執行寫入。")
     sys.exit()
 
 print(f"開始將台股供應鏈數據寫入 TiDB [{DB_NAME}]...")
@@ -130,4 +128,4 @@ try:
             success_count += 1
     print(f"\n 寫入程序結束！成功將 {success_count} 筆記錄同步至 TiDB 中。")
 except Exception as db_err:
-    print(f"\n 資料庫寫入期間發生錯誤！詳細訊息:\n{db_err}")
+    print(f"\n 資料庫寫入期間發生崩潰！詳細錯誤訊息:\n{db_err}")
