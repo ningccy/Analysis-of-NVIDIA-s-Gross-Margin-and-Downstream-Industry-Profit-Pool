@@ -196,7 +196,7 @@ try:
         st.divider()
         st.subheader("🧾 核心財務數據明細")
         st.dataframe(
-            df_filtered[["ticker", "display_quarter", "revenue", "operating_income"]].sort_values(
+            df_filtered[["ticker", "company_name", "display_quarter", "revenue", "operating_income"]].sort_values(
                 by="display_quarter", ascending=False
             ),
             hide_index=True, width="stretch",
