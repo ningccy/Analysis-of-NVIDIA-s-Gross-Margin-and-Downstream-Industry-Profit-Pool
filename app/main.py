@@ -139,6 +139,13 @@ if st.sidebar.button("🔄 立即從 API 同步最新財報資料"):
 
 st.divider()
 
+TICKER_NAME_MAP = {
+    "NVDA": "輝達",
+    "3017.TW": "奇鋐科技",
+    "2382.TW": "廣達電腦",
+    "2357.TW": "華碩",
+}
+
 @st.cache_data
 def load_and_clean_data():
     query = """
@@ -193,6 +200,8 @@ try:
             ),
             hide_index=True, width="stretch",
             column_config={
+                "ticker": st.column_config.TextColumn("代號"),
+                "company_name": st.column_config.TextColumn("公司名稱"),
                 "revenue": st.column_config.NumberColumn("營收 (USD 百萬)", format="%,.2f"),
                 "operating_income": st.column_config.NumberColumn("營業利益 (USD 百萬)", format="%,.2f")
             }
