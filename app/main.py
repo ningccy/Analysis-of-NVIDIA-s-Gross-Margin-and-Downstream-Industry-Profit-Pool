@@ -159,6 +159,7 @@ def load_and_clean_data():
 
     df = df_raw.copy()
     df["display_quarter"] = df["fiscal_quarter"]
+    df["company_name"] = df["ticker"].map(TICKER_NAME_MAP).fillna(df["ticker"])
     nvda_mask = df["ticker"] == "NVDA"
 
     if not df[nvda_mask].empty:
