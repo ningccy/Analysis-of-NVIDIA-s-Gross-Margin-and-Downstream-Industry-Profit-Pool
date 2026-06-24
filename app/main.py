@@ -191,7 +191,11 @@ try:
             df_filtered[["ticker", "display_quarter", "revenue", "operating_income"]].sort_values(
                 by="display_quarter", ascending=False
             ),
-            hide_index=True, width="stretch"
+            hide_index=True, width="stretch",
+            column_config={
+                "revenue": st.column_config.NumberColumn("營收 (USD 百萬)", format="%,.2f"),
+                "operating_income": st.column_config.NumberColumn("營業利益 (USD 百萬)", format="%,.2f")
+            }
         )
 except Exception as e:
     st.error(f"啟動失敗，錯誤訊息: {e}")
