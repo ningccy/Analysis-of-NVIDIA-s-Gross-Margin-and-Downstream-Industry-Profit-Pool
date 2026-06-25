@@ -33,6 +33,7 @@ def get_db_engine():
         connect_args=local_connect_args,
     )
 
+
 engine = get_db_engine()
 
 st.title("📊 半導體與 AI 伺服器產業利潤池分析")
@@ -134,19 +135,23 @@ if st.sidebar.button("🔄 立即從 API 同步最新財報資料"):
                 st.sidebar.success(f"✅ 台股供應鏈 ({tw_success_count} 家) 數據同步成功！")
             else:
                 st.sidebar.warning("⚠️ 台股 API 未回傳資料，可能觸發流量限制。")
+
         except Exception as e:
             st.sidebar.error(f"同步發生錯誤: {e}")
+
+    st.cache_data.clear()
+    st.rerun()
 
 st.divider()
 
 TICKER_NAME_MAP = {
-    "NVDA": "輝達",
-    "3017.TW": "奇鋐科技",
-    "2382.TW": "廣達電腦",
-    "2357.TW": "華碩",
+    "NVDA": "NVIDIA",
+    "3017.TW": "AVC 奇鋐科技",
+    "2382.TW": "Quanta 廣達電腦",
+    "2357.TW": "ASUS 華碩電腦",
 }
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def load_and_clean_data():
     query = """
     SELECT ticker, fiscal_quarter, revenue, cogs, operating_income 
@@ -168,7 +173,13 @@ def load_and_clean_data():
         ).astype(str)
 
     df["operating_income"] = df["operating_income"].fillna(df["revenue"] - df["cogs"])
+
+    safe_revenue = df["revenue"].replace(0, pd.NA)
+    df["gross_margin_pct"] = ((df["revenue"] - df["cogs"]) / safe_revenue * 100).round(2)
+    df["operating_margin_pct"] = (df["operating_income"] / safe_revenue * 100).round(2)
+
     return df
+
 
 try:
     df_clean = load_and_clean_data()
@@ -194,17 +205,49 @@ try:
             st.warning("請在左側控制面板至少勾選一家公司。")
 
         st.divider()
+        st.subheader("📐 毛利率 / 營益率比較")
+        st.caption("觀察重點：誰的利潤率曲線跟著 NVIDIA 同步成長，誰是持平甚至下滑——這是「定價權轉嫁」最直接的證據。")
+        if not df_filtered.empty:
+            df_margin = df_filtered.sort_values(by="display_quarter")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                fig_gm = px.line(
+                    df_margin, x="display_quarter", y="gross_margin_pct", color="company_name",
+                    markers=True, title="毛利率趨勢 (%)"
+                )
+                fig_gm.update_layout(xaxis_title="財季", yaxis_title="毛利率 (%)", height=420)
+                fig_gm.update_traces(hovertemplate="%{y:.2f}%")
+                st.plotly_chart(fig_gm, width="stretch")
+
+            with col2:
+                fig_om = px.line(
+                    df_margin, x="display_quarter", y="operating_margin_pct", color="company_name",
+                    markers=True, title="營業利益率趨勢 (%)"
+                )
+                fig_om.update_layout(xaxis_title="財季", yaxis_title="營業利益率 (%)", height=420)
+                fig_om.update_traces(hovertemplate="%{y:.2f}%")
+                st.plotly_chart(fig_om, width="stretch")
+        else:
+            st.warning("請在左側控制面板至少勾選一家公司。")
+
+        st.divider()
         st.subheader("🧾 核心財務數據明細")
         st.dataframe(
-            df_filtered[["ticker", "company_name", "display_quarter", "revenue", "operating_income"]].sort_values(
-                by="display_quarter", ascending=False
-            ),
+            df_filtered[[
+                "ticker", "company_name", "display_quarter",
+                "revenue", "operating_income", "gross_margin_pct", "operating_margin_pct"
+            ]].sort_values(by="display_quarter", ascending=False),
             hide_index=True, width="stretch",
             column_config={
                 "ticker": st.column_config.TextColumn("代號"),
                 "company_name": st.column_config.TextColumn("公司名稱"),
+                "display_quarter": st.column_config.TextColumn("財季"),
                 "revenue": st.column_config.NumberColumn("營收 (USD 百萬)", format="%,.2f"),
-                "operating_income": st.column_config.NumberColumn("營業利益 (USD 百萬)", format="%,.2f")
+                "operating_income": st.column_config.NumberColumn("營業利益 (USD 百萬)", format="%,.2f"),
+                "gross_margin_pct": st.column_config.NumberColumn("毛利率 (%)", format="%.2f%%"),
+                "operating_margin_pct": st.column_config.NumberColumn("營益率 (%)", format="%.2f%%"),
             }
         )
 except Exception as e:
