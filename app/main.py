@@ -197,10 +197,10 @@ try:
         if not df_filtered.empty:
             fig = px.bar(
                 df_filtered, x="display_quarter", y="operating_income", color="ticker",
-                title="各季度供應鏈利潤池佔比分配", barmode="stack", text="ticker",
-                barnorm="percent"
+                title="各季度供應鏈利潤池佔比分配", barmode="stack", text="ticker"
             )
             fig.update_layout(
+                barnorm="percent",
                 xaxis_title="時間軸 (已對齊 NVDA 財政年度)", 
                 yaxis_title="佔總利潤池比重 (%)", 
                 height=550
