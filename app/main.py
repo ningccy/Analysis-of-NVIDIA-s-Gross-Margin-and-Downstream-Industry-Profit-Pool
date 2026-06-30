@@ -197,7 +197,8 @@ try:
         if not df_filtered.empty:
             fig = px.bar(
                 df_filtered, x="display_quarter", y="operating_income", color="ticker",
-                title="各季度供應鏈總利潤分配份額", barmode="stack", text="ticker",barnorm="percent",barnorm="percent"
+                title="各季度供應鏈利潤池佔比分配", barmode="stack", text="ticker",
+                barnorm="percent"
             )
             fig.update_layout(
                 xaxis_title="時間軸 (已對齊 NVDA 財政年度)", 
