@@ -158,6 +158,7 @@ def load_and_clean_data():
     FROM financial_reports
     WHERE ticker IN ('NVDA', '3017.TW', '2382.TW', '2357.TW')
     """
+    
     df_raw = pd.read_sql(query, engine)
     if df_raw.empty:
         return pd.DataFrame()
@@ -179,7 +180,6 @@ def load_and_clean_data():
     df["operating_margin_pct"] = (df["operating_income"] / safe_revenue * 100).round(2)
 
     return df
-
 
 try:
     df_clean = load_and_clean_data()
@@ -205,8 +205,8 @@ try:
             st.warning("請在左側控制面板至少勾選一家公司。")
 
         st.divider()
+        
         st.subheader("📐 毛利率 / 營益率比較")
-        st.caption("觀察重點：誰的利潤率曲線跟著 NVIDIA 同步成長，誰是持平甚至下滑——這是「定價權轉嫁」最直接的證據。")
         if not df_filtered.empty:
             df_margin = df_filtered.sort_values(by="display_quarter")
 
