@@ -38,7 +38,7 @@ engine = get_db_engine()
 
 st.title("📊 半導體與 AI 伺服器產業利潤池分析")
 st.markdown("本看板追蹤從上游晶片（NVIDIA）到下游組裝與品牌廠的利潤分配與定價權轉嫁。")
-st.divider()
+
 
 st.sidebar.header("💠 控制面板")
 
