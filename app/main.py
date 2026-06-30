@@ -197,9 +197,13 @@ try:
         if not df_filtered.empty:
             fig = px.bar(
                 df_filtered, x="display_quarter", y="operating_income", color="ticker",
-                title="各季度供應鏈總利潤分配份額", barmode="stack", text="ticker"
+                title="各季度供應鏈總利潤分配份額", barmode="stack", text="ticker",barnorm="percent",barnorm="percent"
             )
-            fig.update_layout(xaxis_title="時間軸 (已對齊 NVDA 財政年度)", yaxis_title="利潤規模 (USD 百萬)", height=550)
+            fig.update_layout(
+                xaxis_title="時間軸 (已對齊 NVDA 財政年度)", 
+                yaxis_title="佔總利潤池比重 (%)", 
+                height=550
+            )
             st.plotly_chart(fig, width="stretch")
         else:
             st.warning("請在左側控制面板至少勾選一家公司。")
