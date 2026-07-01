@@ -146,9 +146,9 @@ st.divider()
 
 TICKER_NAME_MAP = {
     "NVDA": "NVIDIA",
-    "3017.TW": "AVC 奇鋐科技",
-    "2382.TW": "Quanta 廣達電腦",
-    "2357.TW": "ASUS 華碩電腦",
+    "3017.TW": "奇鋐科技",
+    "2382.TW": "廣達電腦",
+    "2357.TW": "華碩電腦",
 }
 
 @st.cache_data(show_spinner=False)
