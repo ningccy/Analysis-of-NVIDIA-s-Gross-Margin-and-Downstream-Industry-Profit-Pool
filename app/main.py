@@ -189,7 +189,10 @@ try:
     else:
         all_companies = df_clean["ticker"].unique().tolist()
         selected_companies = st.sidebar.multiselect(
-            "請選擇要對比的廠商：", options=all_companies, default=all_companies
+            "請選擇要對比的廠商：",
+            options=all_companies,
+            default=all_companies,
+            format_func=lambda x: f"{x}｜{TICKER_NAME_MAP.get(x, x)}"
         )
         df_filtered = df_clean[df_clean["ticker"].isin(selected_companies)]
 
