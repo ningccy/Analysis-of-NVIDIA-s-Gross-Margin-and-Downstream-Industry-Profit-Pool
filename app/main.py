@@ -174,10 +174,13 @@ def load_and_clean_data():
         ).astype(str)
 
     df["operating_income"] = df["operating_income"].fillna(df["revenue"] - df["cogs"])
+    df = df.sort_values(["ticker", "fiscal_quarter"])
 
     safe_revenue = df["revenue"].replace(0, pd.NA)
     df["gross_margin_pct"] = ((df["revenue"] - df["cogs"]) / safe_revenue * 100).round(2)
     df["operating_margin_pct"] = (df["operating_income"] / safe_revenue * 100).round(2)
+    df["revenue_qoq"] = (df.groupby("ticker")["revenue"].pct_change(periods=1) * 100).round(2)
+    df["revenue_yoy"] = (df.groupby("ticker")["revenue"].pct_change(periods=4) * 100).round(2)
 
     return df
 
@@ -242,21 +245,46 @@ try:
 
         st.divider()
         st.subheader("🧾 核心財務數據明細")
-        st.dataframe(
-            df_filtered[[
-                "ticker", "company_name", "display_quarter",
-                "revenue", "operating_income", "gross_margin_pct", "operating_margin_pct"
-            ]].sort_values(by="display_quarter", ascending=False),
-            hide_index=True, width="stretch",
-            column_config={
-                "ticker": st.column_config.TextColumn("代號"),
-                "company_name": st.column_config.TextColumn("公司名稱"),
-                "display_quarter": st.column_config.TextColumn("財季"),
-                "revenue": st.column_config.NumberColumn("營收 (USD 百萬)", format="%,.2f"),
-                "operating_income": st.column_config.NumberColumn("營業利益 (USD 百萬)", format="%,.2f"),
-                "gross_margin_pct": st.column_config.NumberColumn("毛利率 (%)", format="%.2f%%"),
-                "operating_margin_pct": st.column_config.NumberColumn("營益率 (%)", format="%.2f%%"),
-            }
+
+        display_cols = {
+            "ticker": "代號",
+            "company_name": "公司名稱",
+            "display_quarter": "財季",
+            "revenue": "營收 (USD 百萬)",
+            "operating_income": "營業利益 (USD 百萬)",
+            "gross_margin_pct": "毛利率 (%)",
+            "operating_margin_pct": "營益率 (%)",
+            "revenue_qoq": "營收 QoQ (%)",
+            "revenue_yoy": "營收 YoY (%)",
+        }
+        
+        df_display = (
+            df_filtered
+            .sort_values(["display_quarter", "ticker"], ascending=[False, True])
+            [list(display_cols.keys())]
+            .rename(columns=display_cols)
         )
+        
+        def color_growth(val):
+            if pd.isna(val):
+                return ""
+            color = "#4CAF50" if val > 0 else "#F44336"
+            return f"color: {color}"
+        
+        st.dataframe(
+            df_display.style
+            .applymap(color_growth, subset=["營收 QoQ (%)", "營收 YoY (%)"])
+            .format({
+                "營收 (USD 百萬)": "{:,.2f}",
+                "營業利益 (USD 百萬)": "{:,.2f}",
+                "毛利率 (%)": "{:.2f}%",
+                "營益率 (%)": "{:.2f}%",
+                "營收 QoQ (%)": lambda x: f"{x:+.2f}%" if pd.notna(x) else "—",
+                "營收 YoY (%)": lambda x: f"{x:+.2f}%" if pd.notna(x) else "—",
+            }),
+            use_container_width=True,
+            hide_index=True,
+        )
+        
 except Exception as e:
     st.error(f"啟動失敗，錯誤訊息: {e}")
