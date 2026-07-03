@@ -272,7 +272,7 @@ try:
         
         st.dataframe(
             df_display.style
-            .applymap(color_growth, subset=["營收 QoQ (%)", "營收 YoY (%)"])
+            .map(color_growth, subset=["營收 QoQ (%)", "營收 YoY (%)"])
             .format({
                 "營收 (USD 百萬)": "{:,.2f}",
                 "營業利益 (USD 百萬)": "{:,.2f}",
