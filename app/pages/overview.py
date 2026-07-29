@@ -10,7 +10,6 @@ from FinMind.data import DataLoader
 st.set_page_config(page_title="AI 供應鏈利潤池看板", layout="wide")
 load_dotenv()
 
-
 @st.cache_resource
 def get_db_engine():
     try:
@@ -32,7 +31,6 @@ def get_db_engine():
         f"mysql+pymysql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}",
         connect_args=local_connect_args,
     )
-
 
 engine = get_db_engine()
 
@@ -198,6 +196,25 @@ try:
             format_func=lambda x: f"{x}｜{TICKER_NAME_MAP.get(x, x)}"
         )
         df_filtered = df_clean[df_clean["ticker"].isin(selected_companies)]
+
+
+        latest_margins = (
+            df_filtered.sort_values("display_quarter")
+            .groupby("ticker")
+            .tail(1)
+            .sort_values("operating_margin_pct", ascending=False)
+        )
+        
+        if not latest_margins.empty:
+            st.markdown("**最新一季營業利益率比較**")
+            margin_cols = st.columns(len(latest_margins))
+            for col, (_, row) in zip(margin_cols, latest_margins.iterrows()):
+                col.metric(
+                    label=f"{row['company_name']}（{row['display_quarter']}）",
+                    value=f"{row['operating_margin_pct']:.2f}%" if pd.notna(row['operating_margin_pct']) else "N/A",
+                )
+            st.caption("以各公司資料庫中最新一季財報計算：營業利益 ÷ 營收")
+            st.divider()
 
         st.subheader("📈 產業利潤池結構變化")
         if not df_filtered.empty:
